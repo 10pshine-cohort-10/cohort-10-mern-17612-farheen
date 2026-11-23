@@ -24,4 +24,7 @@ mongoose.connect(mongo_uri)
         log.info("MongoDB connected");
         app.listen(port, () => log.info(`Server is running on port ${port}.`));
     })
-    .catch((err) => log.error({err}, "MongoDB connection failed"));
+    .catch((err) => {
+        log.error({err}, "MongoDB connection failed");
+        process.exit(1);
+    });
