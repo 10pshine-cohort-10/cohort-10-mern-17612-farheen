@@ -46,3 +46,8 @@ test("the JWT signing key must be set, not the example and at least 32 character
     }
     assert.doesNotThrow(() => check_secret("x".repeat(32)));
 });
+
+test("emoji count as one character each for the length rule", () => {
+    assert.equal(password_problem("Aa1!\u{1F600}\u{1F600}"), "Password needs at least 8 characters"); // 6 characters
+    assert.equal(password_problem("Aa1!\u{1F600}\u{1F600}\u{1F600}\u{1F600}"), ""); // 8 characters
+});

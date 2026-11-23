@@ -9,7 +9,7 @@ const name_re = /^.{2,50}$/;
 const email_re = /^(?=.{6,150}$)[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // strong password: every rule must pass. \p{..} classes so letters and digits from any language count.
 const pass_rules = [
-    [(p) => p.length >= 8, "at least 8 characters"],
+    [(p) => [...p].length >= 8, "at least 8 characters"], // [...p] counts an emoji as 1, not 2
     [(p) => /\p{Lu}/u.test(p), "an uppercase letter"],
     [(p) => /\p{Ll}/u.test(p), "a lowercase letter"],
     [(p) => /\p{Nd}/u.test(p), "a number"],
