@@ -22,7 +22,13 @@ app.use(handle_err);
 mongoose.connect(mongo_uri)
     .then(() => {
         log.info("MongoDB connected");
-        app.listen(port, () => log.info(`Server is running on port ${port}.`));
+        app.listen(port, (err) => {
+            if (err) {
+                log.error({err}, `Server could not start on port ${port}`);
+                process.exit(1);
+            }
+            log.info(`Server is running on port ${port}.`);
+        });
     })
     .catch((err) => {
         log.error({err}, "MongoDB connection failed");
