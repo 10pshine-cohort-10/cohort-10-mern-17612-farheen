@@ -34,9 +34,30 @@ export const check_secret = (s = process.env.JWT_SECRET) => {
     }
 };
 
-export const make_token = (user) => jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: "1h"});
+export const make_token = (user) => jwt.sign({id: user.id, ver: user.ver}, process.env.JWT_SECRET, {expiresIn: "1h"});
 
 export const read_token = (token) => jwt.verify(token, process.env.JWT_SECRET, {algorithms: ["HS256"]});
+
+// token must be valid and still current: the user exists and has not logged out since it was made
+export const read_user = async(token) => {
+    let data;
+    try {
+        data = read_token(token);
+    }
+    catch {
+        log.warn("Bad token");
+        throw new HttpError(401, "Session is not valid, log in again");
+    }
+    const user = await users.find_by_id(data.id);
+    if (!user || user.ver !== data.ver) {
+        log.warn("Old or unknown token");
+        throw new HttpError(401, "Session is not valid, log in again");
+    }
+    return user;
+};
+
+// ends every session of this user: tokens made before this no longer match user.ver
+export const sign_out = async(id) => users.bump_ver(id);
 
 export const register = async(name, email, password, confirm) => {
     if (typeof name !== "string" || !name_re.test(name.trim())) {

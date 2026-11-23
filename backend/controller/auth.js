@@ -1,7 +1,5 @@
 import log from "../config/log.js";
 import * as auth from "../services/auth.js";
-import * as users from "../data/user.js";
-import {HttpError} from "../utils/http_error.js";
 
 export const signup = async(req, res) => {
     const {name, email, password, confirmPassword} = req.body ?? {};
@@ -17,13 +15,14 @@ export const login = async(req, res) => {
     res.json({token, user});
 };
 
-export const logout = (req, res) => {
+export const logout = async(req, res) => {
+    await auth.sign_out(req.user.id);
     log.info({userId: req.user.id}, "User logged out");
     res.json({message: "Logged out"});
 };
 
-export const me = async(req, res) => {
-    const user = await users.find_by_id(req.user.id);
-    if (!user) throw new HttpError(404, "User not found");
+// check_token already loaded the user
+export const me = (req, res) => {
+    const {user} = req;
     res.json({id: user.id, name: user.name, email: user.email});
 };

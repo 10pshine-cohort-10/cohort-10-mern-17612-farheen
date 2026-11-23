@@ -1,19 +1,12 @@
-import {read_token} from "../services/auth.js";
-import log from "../config/log.js";
+import {read_user} from "../services/auth.js";
 import {HttpError} from "../utils/http_error.js";
 
-export const check_token = (req, res, next) => {
+export const check_token = async(req, res, next) => {
   const [scheme, token] = req.headers.authorization?.split(" ") ?? [];
     if (scheme !== "Bearer" || !token) {
         return next(new HttpError(401, "Please log in first"));
     }
 
-  try {
-      req.user = read_token(token);
+  req.user = await read_user(token);
     next();
-  }
-  catch {
-      log.warn("Bad token");
-    next(new HttpError(401, "Session is not valid, log in again"));
-  }
 };
