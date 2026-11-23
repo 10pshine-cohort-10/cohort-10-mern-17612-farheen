@@ -7,8 +7,25 @@ import {HttpError} from "../utils/http_error.js";
 const normal_email = (e) => (typeof e === "string" ? e.trim().toLowerCase() : "");
 const name_re = /^.{2,50}$/;
 const email_re = /^(?=.{6,150}$)[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// bcrypt ignores everything after 72 bytes, and letters like Urdu or emoji take 2-4 bytes each
-const good_pass = (p) => typeof p === "string" && p.length >= 6 && Buffer.byteLength(p) <= 72;
+// strong password: every rule must pass. \p{..} classes so letters and digits from any language count.
+const pass_rules = [
+    [(p) => p.length >= 8, "at least 8 characters"],
+    [(p) => /\p{Lu}/u.test(p), "an uppercase letter"],
+    [(p) => /\p{Ll}/u.test(p), "a lowercase letter"],
+    [(p) => /\p{Nd}/u.test(p), "a number"],
+    [(p) => /[^\p{L}\p{N}\s]/u.test(p), "a special character (like ! @ # $ %)"],
+];
+
+// returns "" for a strong password, otherwise a message that names every missing rule
+export const password_problem = (p) => {
+    if (typeof p !== "string") return "Password is required";
+    // bcrypt ignores everything after 72 bytes, and letters like Urdu or emoji take 2-4 bytes each
+    if (Buffer.byteLength(p) > 72) return "Password is too long (72 bytes max)";
+    const missing = pass_rules.filter(([ok]) => !ok(p)).map(([, rule]) => rule);
+    if (!missing.length) return "";
+    const list = missing.length > 1 ? `${missing.slice(0, -1).join(", ")} and ${missing.at(-1)}` : missing[0];
+    return `Password needs ${list}`;
+};
 
 export const make_token = (user) => jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: "1h"});
 
@@ -21,8 +38,9 @@ export const register = async(name, email, password) => {
     if (!email_re.test(normal_email(email))) {
         throw new HttpError(400, "Email is not valid");
     }
-    if (!good_pass(password)) {
-        throw new HttpError(400, "Password needs at least 6 characters and must not be too long (72 bytes max)");
+    const weak = password_problem(password);
+    if (weak) {
+        throw new HttpError(400, weak);
     }
 
     const taken = await users.find_by_email(normal_email(email));
