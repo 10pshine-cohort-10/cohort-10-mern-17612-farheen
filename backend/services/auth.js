@@ -7,7 +7,8 @@ import {HttpError} from "../utils/http_error.js";
 const normal_email = (e) => (typeof e === "string" ? e.trim().toLowerCase() : "");
 const name_re = /^.{2,50}$/;
 const email_re = /^(?=.{6,150}$)[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const pass_re = /^.{6,72}$/;
+// bcrypt ignores everything after 72 bytes, and letters like Urdu or emoji take 2-4 bytes each
+const good_pass = (p) => typeof p === "string" && p.length >= 6 && Buffer.byteLength(p) <= 72;
 
 export const make_token = (user) => jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: "1h"});
 
@@ -20,8 +21,8 @@ export const register = async(name, email, password) => {
     if (!email_re.test(normal_email(email))) {
         throw new HttpError(400, "Email is not valid");
     }
-    if (typeof password !== "string" || !pass_re.test(password)) {
-        throw new HttpError(400, "Password needs 6 to 72 characters");
+    if (!good_pass(password)) {
+        throw new HttpError(400, "Password needs at least 6 characters and must not be too long (72 bytes max)");
     }
 
     const taken = await users.find_by_email(normal_email(email));
