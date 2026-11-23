@@ -13,6 +13,11 @@ const handle_err = (err, req, res, next) => {
     if (err.name === "ValidationError") {
         code = 400;
     }
+    // unique index caught a duplicate that slipped past the find_by_email check (parallel signups)
+    if (err.code === 11000) {
+        code = 409;
+        msg = "This email is already used";
+    }
 
     if (code >= 500) {
         log.error({err, path: req.path, status: code}, err.message);
