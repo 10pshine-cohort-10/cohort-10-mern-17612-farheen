@@ -11,7 +11,7 @@ const pass_re = /^.{6,72}$/;
 
 export const make_token = (user) => jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: "1h"});
 
-export const read_token = (token) => jwt.verify(token, process.env.JWT_SECRET);
+export const read_token = (token) => jwt.verify(token, process.env.JWT_SECRET, {algorithms: ["HS256"]});
 
 export const register = async(name, email, password) => {
     if (typeof name !== "string" || !name_re.test(name.trim())) {

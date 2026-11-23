@@ -3,8 +3,8 @@ import log from "../config/log.js";
 import {HttpError} from "../utils/http_error.js";
 
 export const check_token = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
+  const [scheme, token] = req.headers.authorization?.split(" ") ?? [];
+    if (scheme !== "Bearer" || !token) {
         return next(new HttpError(401, "Please log in first"));
     }
 
