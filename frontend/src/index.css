@@ -60,13 +60,16 @@ input {
   flex-direction: column;
 }
 
-/* brand at the top, the form starts a little above the middle and the free space goes below it */
+/* brand at the top; free space is split 1 part above the form, 2 parts below, so the form sits a
+   little above the middle. A tall form (sign up with errors) gets no free space, only this margin. */
 .brand-block {
-  margin-bottom: clamp(2rem, 9vh, 5.5rem);
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
 }
 
-.column > :last-child {
-  margin-bottom: auto;
+.column::after {
+  content: "";
+  flex-grow: 2;
 }
 
 .brand {
