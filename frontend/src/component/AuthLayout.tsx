@@ -21,9 +21,7 @@ function AuthLayout({title, children}: Props) {
         {/* one narrow column, so the brand, text and fields all line up on the same left edge */}
         <div className="column">
           <header className="brand-block">
-              <p className="brand"><Logo /></p>
-            <p className="tagline">Write it down. Refine it. Clear what's done.</p>
-          </header>
+              <p className="brand"><Logo /></p>          </header>
           {children}
         </div>
       </main>

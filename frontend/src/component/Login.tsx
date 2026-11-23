@@ -64,8 +64,9 @@ function Login({notice, onLogin, goSignup, goForgot}: Props) {
 
       <div className="actions">
         <button className="btn solid" type="submit" disabled={busy}>{busy ? "Signing in..." : "Sign in"}</button>
-          <button className="link" type="button" onClick={goSignup}>Sign up</button>
       </div>
+
+        <p className="switch">Don't have an account? <button className="link" type="button" onClick={goSignup}>Sign up</button></p>
     </form>
     </AuthLayout>
   );

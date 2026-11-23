@@ -91,8 +91,9 @@ function Signup({goLogin}: Props) {
 
       <div className="actions">
         <button className="btn solid" type="submit" disabled={busy}>{busy ? "Creating account..." : "Create account"}</button>
-          <button className="link" type="button" onClick={() => goLogin()}>Sign in</button>
       </div>
+
+        <p className="switch">Already have an account? <button className="link" type="button" onClick={() => goLogin()}>Sign in</button></p>
     </form>
     </AuthLayout>
   );

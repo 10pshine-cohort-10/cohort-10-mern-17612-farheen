@@ -80,15 +80,6 @@ input {
   width: auto;
 }
 
-/* lines up under the word "QUICK" (the wordmark starts 38px in at the 40px logo height) */
-.tagline {
-  margin: 2px 0 0 38px;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 0.875rem;
-  color: var(--mute);
-}
-
 .display {
   font-family: var(--serif);
   font-style: italic;
@@ -144,6 +135,12 @@ input {
 .field input:focus {
   border-bottom-color: var(--timber);
   box-shadow: 0 1px 0 0 var(--timber);
+}
+
+/* browsers paint saved (autofilled) email and password fields blue or yellow; keep the page colour instead */
+.field input:-webkit-autofill {
+  -webkit-text-fill-color: var(--fg);
+  transition: background-color 600000s 0s;
 }
 
 .field input[aria-invalid="true"] {
@@ -258,6 +255,12 @@ input {
   margin-top: 8px;
 }
 
+.switch {
+  margin: 20px 0 0;
+  font-size: 0.8125rem;
+  color: var(--mute);
+}
+
 .btn {
   font-size: 0.8125rem;
   font-weight: 600;
@@ -357,12 +360,12 @@ button:focus-visible {
 /* short screens (most laptops): tighter spacing so the longest form (sign up) still fits without scrolling */
 @media (max-height: 760px) {
   .panel {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 
   .brand-block {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.75rem;
   }
 
   .display {
@@ -370,11 +373,15 @@ button:focus-visible {
   }
 
   .lead {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   .field input {
     padding: 5px 0;
+  }
+
+  .switch {
+    margin-top: 12px;
   }
 }
 
