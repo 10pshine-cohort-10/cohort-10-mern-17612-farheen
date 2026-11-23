@@ -1,12 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700&display=swap");
+/* fonts are loaded in index.html. Sizes use rem so they follow the user's browser font size setting. */
 
 :root {
-  --bg: #f7f2ea;
+  /* warm whites instead of pure #fff, softer on the eyes */
+  --bg: #f8f3eb;
   --fg: #1c1c1c;
-  --mute: #555555;
-  --rule: #d9c3a5;
-  --accent: #c49a6c;
-  --card-light: #fbf7f0;
+  --mute: #6b625a;
+  --line: #8f7f6f; /* input underline, 3:1 against the background so the fields are easy to see */
+  --timber: #7a4e2d;
+  --timber-dark: #5c3a20;
+  --timber-soft: rgba(122, 78, 45, 0.12);
+  --danger: #b42318;
+  --ok: #2f6b3a;
+  --serif: "Playfair Display", Georgia, serif;
   color-scheme: light;
 }
 
@@ -23,150 +28,304 @@ body {
 
 body {
   font-family: "Libre Franklin", system-ui, sans-serif;
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 0.875rem;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 button,
 input {
-  font-family: inherit;
+  font: inherit;
 }
 
-.display {
-  font-weight: 700;
-  line-height: 1.1;
+/* full screen split: form on the left half, picture covering the right half, no card around it */
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.panel {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 3rem;
+}
+
+/* narrow column, everything lines up on its left edge like the reference */
+.column {
+  width: 100%;
+  max-width: 22rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* brand at the top, the form starts a little above the middle and the free space goes below it */
+.brand-block {
+  margin-bottom: clamp(2rem, 9vh, 5.5rem);
+}
+
+.column > :last-child {
+  margin-bottom: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
+  /* engraved capitals, same style as the QUICK NOTES title in the side picture */
+  font-family: "Cinzel", Georgia, serif;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--timber);
 }
 
-.label {
-  font-size: 14px;
+/* lines up under the words, after the 28px icon and 10px gap */
+.tagline {
+  margin: 2px 0 0 38px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.875rem;
   color: var(--mute);
 }
 
-.btn {
-  font-size: 14px;
+.display {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.875rem;
+  line-height: 1.15;
+  color: var(--timber);
+  margin: 0 0 0.5rem;
+}
+
+.lead {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--mute);
+  margin: 0 0 1.375rem;
+}
+
+.label {
+  font-size: 0.75rem;
   font-weight: 600;
-  background: transparent;
-  color: var(--fg);
-  border: 1px solid var(--fg);
-  border-radius: 999px;
-  padding: 10px 18px;
-  cursor: pointer;
-}
-
-.btn:hover {
-  background: var(--fg);
-  color: var(--bg);
-}
-
-.btn.solid {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--fg);
-}
-
-.btn.solid:hover {
-  background: transparent;
-  color: var(--fg);
-}
-
-.link {
-  background: none;
-  border: none;
-  padding: 0;
-  margin-top: 16px;
-  color: var(--fg);
-  font: inherit;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-color: var(--mute);
-}
-
-input {
-  font: inherit;
-  color: var(--fg);
-  background: #fff;
-  border: 1px solid var(--rule);
-  border-radius: 12px;
-  padding: 10px 14px;
-  width: 100%;
-  outline: none;
-  appearance: none;
-}
-
-input:focus {
-  border-color: var(--fg);
-}
-
-button:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--fg);
-  outline-offset: 2px;
+  color: var(--mute);
+  transition: color 0.15s;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 20px;
+  gap: 2px;
+  margin-bottom: 4px;
 }
 
-.panel {
-  max-width: 420px;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  background: var(--card-light);
-  border: 1px solid var(--rule);
-  border-radius: 16px;
+/* label turns timber while its input is focused, like the active field in the reference */
+.field:focus-within .label {
+  color: var(--timber);
 }
 
-.panel .display {
-  font-size: 40px;
-  margin-bottom: 28px;
+/* underline-only inputs, like the reference */
+.field input {
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 6px 0;
+  outline: none;
+  appearance: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.error {
-  color: #c0392b;
-  margin: 0 0 16px;
+/* 2px timber line on focus (box-shadow so the text does not shift) */
+.field input:focus {
+  border-bottom-color: var(--timber);
+  box-shadow: 0 1px 0 0 var(--timber);
 }
 
-.auth {
+.field input[aria-invalid="true"] {
+  border-bottom-color: var(--danger);
+}
+
+.field input[aria-invalid="true"]:focus {
+  box-shadow: 0 1px 0 0 var(--danger);
+}
+
+/* one line is always reserved under each input, so showing an error does not move anything */
+.field-error {
+  font-size: 0.75rem;
+  line-height: 18px;
+  min-height: 18px;
+  color: var(--danger);
+  margin: 0;
+}
+
+.check label {
   display: flex;
   align-items: center;
-  gap: 48px;
-  max-width: 1040px;
-  min-height: 80vh;
-  margin: 0 auto;
-  padding: 0 16px;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: var(--mute);
+  cursor: pointer;
 }
 
-.auth .panel {
-  flex: 1;
+.check strong {
+  color: var(--timber);
+  font-weight: 600;
+}
+
+.check input {
+  width: 16px;
+  height: 16px;
   margin: 0;
+  accent-color: var(--timber);
+  cursor: pointer;
+}
+
+.check input:focus-visible {
+  outline: 2px solid var(--timber);
+  outline-offset: 2px;
+}
+
+.check .field-error {
+  padding-left: 26px;
+}
+
+.row-end {
+  display: flex;
+  justify-content: flex-end;
+  margin: -2px 0 6px;
+}
+
+/* text link look for switching screens (still a button, it changes the screen, not the URL) */
+.link {
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--timber);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  color: var(--timber-dark);
+}
+
+.link.small {
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.link.small:hover {
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 11px 34px;
+  border-radius: 999px;
+  border: 1px solid var(--timber);
+  background: transparent;
+  color: var(--timber);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.btn:hover {
+  background: var(--timber-soft);
+}
+
+/* pill button with a soft shadow, like the reference */
+.btn.solid {
+  background: var(--timber);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(122, 78, 45, 0.25);
+}
+
+.btn.solid:hover {
+  background: var(--timber-dark);
+  border-color: var(--timber-dark);
+}
+
+/* while a request is running */
+.btn:disabled {
+  opacity: 0.65;
+  cursor: progress;
+  box-shadow: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--timber);
+  outline-offset: 2px;
+}
+
+.error,
+.notice {
+  font-size: 0.8125rem;
+  color: var(--danger);
+  margin: 0 0 14px;
+}
+
+.notice {
+  color: var(--ok);
 }
 
 .auth-art {
-  flex: 1;
+  position: relative;
   margin: 0;
-  display: flex;
-  justify-content: center;
+  background: #2a2420;
 }
 
+/* absolute so the tall picture covers its half without changing the page height */
 .auth-art img {
+  position: absolute;
+  inset: 0;
+  display: block;
   width: 100%;
-  max-width: 360px;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .auth-art {
     display: none;
   }
 
-  .auth .panel {
-    margin-top: 14vh;
+  .panel {
+    padding: 2rem 1.5rem;
+  }
+
+  .display {
+    font-size: 1.75rem;
+  }
+}
+
+/* respect the "reduce motion" setting of the operating system */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
   }
 }

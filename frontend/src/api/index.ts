@@ -12,3 +12,12 @@ api.interceptors.request.use((config) => {
     }
     return config;
 });
+
+// one place that turns any request error into a message the user can read
+export function error_message(err: unknown) {
+    if (!axios.isAxiosError(err)) return "Something went wrong, please try again";
+    if (!err.response) return "Could not reach the server, check that it is running";
+    return err.response.data?.message ?? "Something went wrong, please try again";
+}
+
+export const error_status = (err: unknown) => (axios.isAxiosError(err) ? err.response?.status : undefined);

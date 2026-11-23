@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
-import {api} from "../api";
+import {api, error_message, error_status} from "../api";
+import AuthLayout from "./AuthLayout.tsx";
 
 type User = {id: string; name: string; email: string};
 
@@ -13,12 +14,16 @@ function Success({onLogout}: Props) {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-      api.get("/api/me")
-        .then((res) => setUser(res.data))
+      // ignore the answer if the page was left before it came back
+      let live = true;
+    api.get<User>("/api/me")
+        .then((res) => { if (live) setUser(res.data); })
       .catch((err) => {
-          if (err.response?.status === 401) onLogout(); // token expired or not valid, back to sign in
-          else setMsg(err.response?.data?.message ?? "Could not reach the server, check that it is running");
+          if (!live) return;
+          if (error_status(err) === 401) onLogout(); // token expired or not valid, back to sign in
+          else setMsg(error_message(err));
       });
+      return () => { live = false; };
   }, [onLogout]);
 
   async function logout() {
@@ -32,21 +37,20 @@ function Success({onLogout}: Props) {
   }
 
   return (
-    <section className="auth">
-    <div className="panel" role="status">
-        <p className="label">Account</p>
+    <AuthLayout title="Welcome">
+    <div role="status">
       <h1 className="display">Login successful</h1>
 
       {user && (
-          <p>Signed in as <strong>{user.name}</strong> ({user.email})</p>
+          <p className="lead">Signed in as <strong>{user.name}</strong> ({user.email})</p>
       )}
-        {!user && !msg && <p className="label">Checking your session...</p>}
+        {!user && !msg && <p className="lead">Checking your session...</p>}
       {msg && <p className="error">{msg}</p>}
-
-        <button className="btn solid" type="button" onClick={logout}>Log out</button>
     </div>
-      <figure className="auth-art"><img src="/note.svg" alt="" /></figure>
-    </section>
+      <div className="actions">
+        <button className="btn solid" type="button" onClick={logout}>Log out</button>
+      </div>
+    </AuthLayout>
   );
 }
 export default Success;
