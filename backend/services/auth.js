@@ -31,7 +31,7 @@ export const make_token = (user) => jwt.sign({id: user.id}, process.env.JWT_SECR
 
 export const read_token = (token) => jwt.verify(token, process.env.JWT_SECRET, {algorithms: ["HS256"]});
 
-export const register = async(name, email, password) => {
+export const register = async(name, email, password, confirm) => {
     if (typeof name !== "string" || !name_re.test(name.trim())) {
         throw new HttpError(400, "Name needs 2 to 50 characters");
     }
@@ -41,6 +41,10 @@ export const register = async(name, email, password) => {
     const weak = password_problem(password);
     if (weak) {
         throw new HttpError(400, weak);
+    }
+    // the retyped password must match, so a typo cannot lock the user out of a new account
+    if (confirm !== password) {
+        throw new HttpError(400, "Passwords do not match");
     }
 
     const taken = await users.find_by_email(normal_email(email));

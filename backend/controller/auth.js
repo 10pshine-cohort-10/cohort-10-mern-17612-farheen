@@ -4,8 +4,8 @@ import * as users from "../data/user.js";
 import {HttpError} from "../utils/http_error.js";
 
 export const signup = async(req, res) => {
-    const {name, email, password} = req.body ?? {};
-    const user = await auth.register(name, email, password);
+    const {name, email, password, confirmPassword} = req.body ?? {};
+    const user = await auth.register(name, email, password, confirmPassword);
     log.info({userId: user.id}, "New user signed up");
     res.status(201).json({id: user.id, name: user.name, email: user.email});
 };

@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {password_problem} from "../services/auth.js";
+import {password_problem, register} from "../services/auth.js";
 
 test("weak passwords are rejected with every missing rule named", () => {
     assert.equal(password_problem("123456"),
@@ -26,4 +26,16 @@ test("missing and too long passwords are rejected", () => {
     assert.equal(password_problem(12345678), "Password is required");
     assert.equal(password_problem("Aa1!" + "a".repeat(69)), "Password is too long (72 bytes max)");
     assert.equal(password_problem("Aa1!" + "a".repeat(68)), ""); // exactly 72 bytes is fine
+});
+
+// these fail before register() touches the database, so no MongoDB is needed
+test("signup rejects a missing or different retyped password", async () => {
+    const mismatch = {status: 400, message: "Passwords do not match"};
+    await assert.rejects(register("Test User", "t@test.com", "Password1!", "Password2!"), mismatch);
+    await assert.rejects(register("Test User", "t@test.com", "Password1!", undefined), mismatch);
+    await assert.rejects(register("Test User", "t@test.com", "Password1!", "password1!"), mismatch); // case matters
+});
+
+test("a weak password is reported before the retype check", async () => {
+    await assert.rejects(register("Test User", "t@test.com", "weak", "weak"), {status: 400, message: /^Password needs/});
 });
