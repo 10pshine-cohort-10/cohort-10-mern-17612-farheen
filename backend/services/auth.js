@@ -27,6 +27,13 @@ export const password_problem = (p) => {
     return `Password needs ${list}`;
 };
 
+// called once at startup: a missing, example or short key would let anyone forge tokens
+export const check_secret = (s = process.env.JWT_SECRET) => {
+    if (!s || s.startsWith("change_me") || s.length < 32) {
+        throw new Error("JWT_SECRET must be set to at least 32 random characters (not the example value)");
+    }
+};
+
 export const make_token = (user) => jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: "1h"});
 
 export const read_token = (token) => jwt.verify(token, process.env.JWT_SECRET, {algorithms: ["HS256"]});

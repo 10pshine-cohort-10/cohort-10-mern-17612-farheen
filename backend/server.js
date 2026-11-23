@@ -5,6 +5,15 @@ import pinoHttp from "pino-http";
 import router from "./router/index.js";
 import log from "./config/log.js";
 import handle_err, {not_found} from "./middleware/err.js";
+import {check_secret} from "./services/auth.js";
+
+try {
+    check_secret();
+}
+catch (err) {
+    log.error(err.message);
+    process.exit(1);
+}
 
 const app = express();
 const port = process.env.PORT || 3600;

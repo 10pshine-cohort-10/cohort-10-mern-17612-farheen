@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {password_problem, register} from "../services/auth.js";
+import {password_problem, register, check_secret} from "../services/auth.js";
 
 test("weak passwords are rejected with every missing rule named", () => {
     assert.equal(password_problem("123456"),
@@ -38,4 +38,11 @@ test("signup rejects a missing or different retyped password", async () => {
 
 test("a weak password is reported before the retype check", async () => {
     await assert.rejects(register("Test User", "t@test.com", "weak", "weak"), {status: 400, message: /^Password needs/});
+});
+
+test("the JWT signing key must be set, not the example and at least 32 characters", () => {
+    for (const bad of [undefined, "", "change_me", "short_key", "change_me_to_at_least_32_random_characters"]) {
+        assert.throws(() => check_secret(bad), /JWT_SECRET/, String(bad));
+    }
+    assert.doesNotThrow(() => check_secret("x".repeat(32)));
 });
