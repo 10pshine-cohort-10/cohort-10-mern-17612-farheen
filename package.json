@@ -1,0 +1,8 @@
+{
+  "name": "notes-app",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --filter notes-backend dev"
+  }
+}
