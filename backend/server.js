@@ -6,6 +6,7 @@ import router from "./router/index.js";
 import log from "./config/log.js";
 import handle_err, {not_found} from "./middleware/err.js";
 import {check_secret} from "./services/auth.js";
+import {db} from "./models/index.ts";
 
 try {
     check_secret();
@@ -29,8 +30,10 @@ app.use("/api", not_found);
 app.use(handle_err);
 
 mongoose.connect(mongo_uri)
+    // wait until the unique email index exists, before that two signups could save the same email
+    .then(() => Promise.all(Object.values(db).map((m) => m.init())))
     .then(() => {
-        log.info("MongoDB connected");
+        log.info("MongoDB connected, indexes ready");
         app.listen(port, (err) => {
             if (err) {
                 log.error({err}, `Server could not start on port ${port}`);
@@ -40,6 +43,6 @@ mongoose.connect(mongo_uri)
         });
     })
     .catch((err) => {
-        log.error({err}, "MongoDB connection failed");
+        log.error({err}, "MongoDB connection or index setup failed");
         process.exit(1);
     });
