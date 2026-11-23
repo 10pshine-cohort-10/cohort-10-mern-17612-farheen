@@ -70,20 +70,17 @@ input {
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin: 0;
-  /* engraved capitals, same style as the QUICK NOTES title in the side picture */
-  font-family: "Cinzel", Georgia, serif;
-  font-weight: 700;
-  font-size: 1.125rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--timber);
+  line-height: 0;
 }
 
-/* lines up under the words, after the 28px icon and 10px gap */
+/* the logo svg (src/component/Logo.tsx), wordmark set in Cinzel */
+.logo {
+  display: block;
+  width: auto;
+}
+
+/* lines up under the word "QUICK" (the wordmark starts 38px in at the 40px logo height) */
 .tagline {
   margin: 2px 0 0 38px;
   font-family: var(--serif);

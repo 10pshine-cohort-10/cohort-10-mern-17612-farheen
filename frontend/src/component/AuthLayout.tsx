@@ -1,5 +1,6 @@
 import {useEffect, type ReactNode} from "react";
 import side from "../../images/login-page-side.jpg";
+import Logo from "./Logo.tsx";
 
 type Props = {
     title: string;
@@ -20,7 +21,7 @@ function AuthLayout({title, children}: Props) {
         {/* one narrow column, so the brand, text and fields all line up on the same left edge */}
         <div className="column">
           <header className="brand-block">
-              <p className="brand"><img src="/favicon.svg" alt="" width="28" height="28" />Quick Notes</p>
+              <p className="brand"><Logo /></p>
             <p className="tagline">Write it down. Refine it. Clear what's done.</p>
           </header>
           {children}
