@@ -163,6 +163,30 @@ input {
   margin: 0;
 }
 
+.field-error.ok {
+  color: var(--ok);
+}
+
+/* password strength bar: 4 parts, filled and coloured by level (-1 empty, 0 too weak ... 3 strong) */
+.meter {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.meter span {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: #e4dacd;
+  transition: background 0.2s;
+}
+
+.meter[data-level="0"] span:nth-child(-n + 1) { background: var(--danger); }
+.meter[data-level="1"] span:nth-child(-n + 2) { background: #c2410c; }
+.meter[data-level="2"] span:nth-child(-n + 3) { background: #a16207; }
+.meter[data-level="3"] span { background: var(--ok); }
+
 .check label {
   display: flex;
   align-items: center;
@@ -328,6 +352,30 @@ button:focus-visible {
 
   .display {
     font-size: 1.75rem;
+  }
+}
+
+/* short screens (most laptops): tighter spacing so the longest form (sign up) still fits without scrolling */
+@media (max-height: 760px) {
+  .panel {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .brand-block {
+    margin-bottom: 1.25rem;
+  }
+
+  .display {
+    font-size: 1.625rem;
+  }
+
+  .lead {
+    margin-bottom: 1rem;
+  }
+
+  .field input {
+    padding: 5px 0;
   }
 }
 
