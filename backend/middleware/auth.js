@@ -7,6 +7,11 @@ export const check_token = async(req, res, next) => {
         return next(new HttpError(401, "Please log in first"));
     }
 
-  req.user = await read_user(token);
-    next();
+    try {
+        req.user = await read_user(token);
+    }
+    catch (err) {
+        return next(err);
+    }
+    next(); // outside the try, so an error further down is not sent to next twice
 };
