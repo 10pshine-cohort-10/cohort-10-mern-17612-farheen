@@ -14,8 +14,10 @@ function App() {
     setScreen(next);
   };
 
-  // stable function, so Success does not re-run its /api/me request on every render
-  const logout = useCallback(() => {
+  // stable function, so Success does not re-run its /api/me request on every render.
+  // old = the token the finished request was sent with; if the user has signed in again since, keep the new session
+  const logout = useCallback((old: string | null) => {
+      if (localStorage.getItem("token") !== old) return;
       localStorage.removeItem("token");
       setToken("");
     setScreen("login");
