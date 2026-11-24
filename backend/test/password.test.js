@@ -1,6 +1,11 @@
 import {expect} from "chai";
 import {password_problem, register, check_secret} from "../services/auth.js";
 
+/**
+ * Runs fn and gives back what it threw (a sync throw or a rejected promise), or null if it did not throw.
+ * @param {() => unknown} fn
+ * @returns {Promise<(Error & {status?: number}) | null>}
+ */
 const fails = async (fn) => {
     try {
         await fn();
@@ -59,7 +64,16 @@ describe("signup password checks", () => {
 
 describe("JWT_SECRET check", () => {
     it("rejects missing, example and short secrets", () => {
-        for (const bad of [undefined, "", "change_me", "short_key", "change_me_to_at_least_32_random_characters"]) {
+        // no argument reads process.env.JWT_SECRET, so remove it for this check; a shell or CI that exports one must not change the result
+        const saved = process.env.JWT_SECRET;
+        delete process.env.JWT_SECRET;
+        try {
+            expect(() => check_secret()).to.throw(/JWT_SECRET/);
+        }
+        finally {
+            if (saved !== undefined) process.env.JWT_SECRET = saved;
+        }
+        for (const bad of ["", "change_me", "short_key", "change_me_to_at_least_32_random_characters"]) {
             expect(() => check_secret(bad), String(bad)).to.throw(/JWT_SECRET/);
         }
     });
