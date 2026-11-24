@@ -13,5 +13,5 @@ export const check_token = async(req, res, next) => {
     catch (err) {
         return next(err);
     }
-    next(); // outside the try, so an error further down is not sent to next twice
+    next();
 };
