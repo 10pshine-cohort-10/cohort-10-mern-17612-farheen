@@ -1,0 +1,37 @@
+import log from "../config/log.js";
+
+const handle_err = (err, req, res, next) => {
+    if (res.headersSent) return next(err);
+
+    let code = err.status || 500;
+    let msg = err.message;
+
+    if (err.name === "CastError") {
+        code = 400;
+        msg = "Bad id";
+    }
+    if (err.name === "ValidationError") {
+        code = 400;
+    }
+    // unique index caught a duplicate that slipped past the find_by_email check (parallel signups)
+    if (err.code === 11000) {
+        code = 409;
+        msg = "This email is already used";
+    }
+
+    if (code >= 500) {
+        log.error({err, path: req.path, status: code}, err.message);
+        msg = "Something went wrong";
+    }
+    else {
+        log.warn({path: req.path, status: code}, msg);
+    }
+
+    res.status(code).json({message: msg});
+};
+
+export const not_found = (req, res) => {
+    res.status(404).json({message: "Route not found"});
+};
+
+export default handle_err;
