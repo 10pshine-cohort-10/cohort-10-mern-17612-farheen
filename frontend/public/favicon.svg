@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Quick Notes mark: same notebook as the logo in src/component/Logo.tsx, centered for the tab icon -->
+  <g transform="translate(6 0)">
+    <rect x="3" y="4" width="30" height="40" rx="4" fill="#7a4e2d"/>
+    <path d="M7 4h4v40H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z" fill="#5c3a20"/>
+    <path d="M16 18h11M16 25h11M16 32h7" stroke="#f8f3eb" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M24 4v9.5l2.75-2.2 2.75 2.2V4z" fill="#c49a6c"/>
+  </g>
+</svg>
