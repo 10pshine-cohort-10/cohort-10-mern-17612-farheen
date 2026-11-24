@@ -3,6 +3,8 @@ import axios from "axios";
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3600",
     headers: {"Content-type": "application/json"},
+  // axios waits forever by default; a stuck request would leave the buttons disabled
+  timeout: 10000,
 });
 
 api.interceptors.request.use((config) => {
@@ -16,6 +18,7 @@ api.interceptors.request.use((config) => {
 // one place that turns any request error into a message the user can read
 export function error_message(err: unknown) {
     if (!axios.isAxiosError(err)) return "Something went wrong, please try again";
+    if (err.code === "ECONNABORTED") return "The server is taking too long, please try again";
     if (!err.response) return "Could not reach the server, check that it is running";
     return err.response.data?.message ?? "Something went wrong, please try again";
 }
