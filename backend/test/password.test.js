@@ -1,53 +1,70 @@
-import {test} from "node:test";
-import assert from "node:assert/strict";
+import {expect} from "chai";
 import {password_problem, register, check_secret} from "../services/auth.js";
 
-test("weak passwords are rejected with every missing rule named", () => {
-    assert.equal(password_problem("123456"),
-        "Password needs at least 8 characters, an uppercase letter, a lowercase letter and a special character (like ! @ # $ %)");
-    assert.equal(password_problem("password"),
-        "Password needs an uppercase letter, a number and a special character (like ! @ # $ %)");
-    assert.equal(password_problem("Password1"), "Password needs a special character (like ! @ # $ %)");
-    assert.equal(password_problem("Pass1!"), "Password needs at least 8 characters");
-    assert.equal(password_problem("PASSWORD1!"), "Password needs a lowercase letter");
-    assert.equal(password_problem("password1!"), "Password needs an uppercase letter");
-    assert.equal(password_problem("Password!!"), "Password needs a number");
-    assert.equal(password_problem("Pass word1"), "Password needs a special character (like ! @ # $ %)"); // a space is not special
-});
-
-test("strong passwords pass", () => {
-    for (const p of ["Password1!", "Str0ng#Pass", "Farheen@2026", "ابجد Aa1!"]) {
-        assert.equal(password_problem(p), "", p);
+const fails = async (fn) => {
+    try {
+        await fn();
+        return null;
     }
-});
-
-test("missing and too long passwords are rejected", () => {
-    assert.equal(password_problem(undefined), "Password is required");
-    assert.equal(password_problem(12345678), "Password is required");
-    assert.equal(password_problem("Aa1!" + "a".repeat(69)), "Password is too long (72 bytes max)");
-    assert.equal(password_problem("Aa1!" + "a".repeat(68)), ""); // exactly 72 bytes is fine
-});
-
-// these fail before register() touches the database, so no MongoDB is needed
-test("signup rejects a missing or different retyped password", async () => {
-    const mismatch = {status: 400, message: "Passwords do not match"};
-    await assert.rejects(register("Test User", "t@test.com", "Password1!", "Password2!"), mismatch);
-    await assert.rejects(register("Test User", "t@test.com", "Password1!", undefined), mismatch);
-    await assert.rejects(register("Test User", "t@test.com", "Password1!", "password1!"), mismatch); // case matters
-});
-
-test("a weak password is reported before the retype check", async () => {
-    await assert.rejects(register("Test User", "t@test.com", "weak", "weak"), {status: 400, message: /^Password needs/});
-});
-
-test("the JWT signing key must be set, not the example and at least 32 characters", () => {
-    for (const bad of [undefined, "", "change_me", "short_key", "change_me_to_at_least_32_random_characters"]) {
-        assert.throws(() => check_secret(bad), /JWT_SECRET/, String(bad));
+    catch (err) {
+        return err;
     }
-    assert.doesNotThrow(() => check_secret("x".repeat(32)));
+};
+
+describe("password rules", () => {
+    it("names every missing rule", () => {
+        expect(password_problem("123456")).to.equal("Password needs at least 8 characters, an uppercase letter, a lowercase letter and a special character (like ! @ # $ %)");
+        expect(password_problem("password")).to.equal("Password needs an uppercase letter, a number and a special character (like ! @ # $ %)");
+        expect(password_problem("Password1")).to.equal("Password needs a special character (like ! @ # $ %)");
+        expect(password_problem("Pass1!")).to.equal("Password needs at least 8 characters");
+        expect(password_problem("PASSWORD1!")).to.equal("Password needs a lowercase letter");
+        expect(password_problem("password1!")).to.equal("Password needs an uppercase letter");
+        expect(password_problem("Password!!")).to.equal("Password needs a number");
+        expect(password_problem("Pass word1")).to.equal("Password needs a special character (like ! @ # $ %)");
+    });
+
+    it("passes strong passwords", () => {
+        for (const p of ["Password1!", "Str0ng#Pass", "Farheen@2026", "ابجد Aa1!"]) {
+            expect(password_problem(p), p).to.equal("");
+        }
+    });
+
+    it("rejects missing and too long passwords", () => {
+        expect(password_problem(undefined)).to.equal("Password is required");
+        expect(password_problem(12345678)).to.equal("Password is required");
+        expect(password_problem("Aa1!" + "a".repeat(69))).to.equal("Password is too long (72 bytes max)");
+        expect(password_problem("Aa1!" + "a".repeat(68))).to.equal("");
+    });
+
+    it("counts emoji as one character each", () => {
+        expect(password_problem("Aa1!\u{1F600}\u{1F600}")).to.equal("Password needs at least 8 characters");
+        expect(password_problem("Aa1!\u{1F600}\u{1F600}\u{1F600}\u{1F600}")).to.equal("");
+    });
 });
 
-test("emoji count as one character each for the length rule", () => {
-    assert.equal(password_problem("Aa1!\u{1F600}\u{1F600}"), "Password needs at least 8 characters"); // 6 characters
-    assert.equal(password_problem("Aa1!\u{1F600}\u{1F600}\u{1F600}\u{1F600}"), ""); // 8 characters
+describe("signup password checks", () => {
+    it("rejects a missing or different retyped password", async () => {
+        const mismatch = "Passwords do not match";
+        expect((await fails(() => register("Test User", "t@test.com", "Password1!", "Password2!"))).message).to.equal(mismatch);
+        expect((await fails(() => register("Test User", "t@test.com", "Password1!", undefined))).message).to.equal(mismatch);
+        expect((await fails(() => register("Test User", "t@test.com", "Password1!", "password1!"))).message).to.equal(mismatch);
+    });
+
+    it("reports a weak password before the retype check", async () => {
+        const err = await fails(() => register("Test User", "t@test.com", "weak", "weak"));
+        expect(err.status).to.equal(400);
+        expect(err.message).to.match(/^Password needs/);
+    });
+});
+
+describe("JWT_SECRET check", () => {
+    it("rejects missing, example and short secrets", () => {
+        for (const bad of [undefined, "", "change_me", "short_key", "change_me_to_at_least_32_random_characters"]) {
+            expect(() => check_secret(bad), String(bad)).to.throw(/JWT_SECRET/);
+        }
+    });
+
+    it("accepts a long secret", () => {
+        expect(() => check_secret("x".repeat(32))).to.not.throw();
+    });
 });
