@@ -32,7 +32,7 @@ function Login({notice, onLogin, goSignup, goForgot}: Props) {
     setMsg("");
       setBusy(true);
     try {
-        const res = await api.post("/api/login", {email: form.email, password: form.pass});
+        const res = await api.post<{token: string}>("/api/login", {email: form.email, password: form.pass});
       localStorage.setItem("token", res.data.token);
         onLogin();
     }

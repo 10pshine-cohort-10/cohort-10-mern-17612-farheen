@@ -23,7 +23,7 @@ function Forgot({goLogin}: Props) {
     setMsg({text: "", ok: false});
       setBusy(true);
     try {
-        const res = await api.post("/api/forgot-password", {email});
+        const res = await api.post<{message?: string}>("/api/forgot-password", {email});
       setMsg({text: res.data?.message ?? "If this email has an account, a reset link has been sent.", ok: true});
     }
     catch (err) {
